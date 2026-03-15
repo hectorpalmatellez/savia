@@ -1,0 +1,20 @@
+.container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 1rem;
+    background-color: #f9fbf9; /* Soft organic white */
+    min-height: 100vh;
+}
+
+.imageSection {
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    margin-bottom: 1.5rem;
+}
+
+.careGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}

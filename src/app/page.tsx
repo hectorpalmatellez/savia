@@ -1,66 +1,76 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client'; // Keeping it client-side for the MVP to avoid serialization issues
 
-export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+import Link from 'next/link';
+import { PLANT_DATA } from "@/data/plants";
+import {
+    Container,
+    SimpleGrid,
+    Card,
+    CardSection,
+    Image,
+    Badge,
+    Group,
+    Button,
+    Text,
+    Stack
+} from '@mantine/core';
+
+export default function HomePage() {
+    // 1. Transform the data and log it to debug
+    const allPlants = Object.keys(PLANT_DATA).map((id) => {
+        const data = PLANT_DATA[id];
+        console.log(`Cargando planta: ${id}`, data); // Check your browser console (F12)
+        return {
+            id,
+            ...data,
+        };
+    });
+
+    return (
+        <Container size="md" py="xl">
+            <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
+                {allPlants.map((plant) => (
+                    <Card key={plant.id} shadow="sm" padding="lg" radius="md" withBorder>
+
+                        {/* Image with a guaranteed height */}
+                        <CardSection>
+                            <Image
+                                src={plant.image || "https://placehold.co/600x400?text=No+Photo"}
+                                height={160}
+                                alt={plant.common_name || "Planta"}
+                            />
+                        </CardSection>
+
+                        <Group justify="space-between" mt="md" mb="xs">
+                            {/* Fallback to the ID if common_name is missing */}
+                            <Text fw={700}>{plant.common_name || `ID: ${plant.id}`}</Text>
+                            <Badge color="green" variant="light">
+                                {plant.location || "Sin ubicación"}
+                            </Badge>
+                        </Group>
+
+                        <Stack gap={4} mb="md">
+                            <Text size="sm" c="dimmed">
+                                ☀️ Luz: <strong>{plant.requirements?.light || "No especificada"}</strong>
+                            </Text>
+                            <Text size="sm" c="dimmed">
+                                💧 Riego: <strong>{plant.requirements?.water || "No especificado"}</strong>
+                            </Text>
+                        </Stack>
+
+                        <Link href={`/plant/${plant.id}`} style={{ textDecoration: 'none' }}>
+                            <Button
+                                component="div" // Necessary to avoid nested anchor tags
+                                color="green.8"
+                                fullWidth
+                                radius="md"
+                            >
+                                Ver Detalles
+                            </Button>
+                        </Link>
+                    </Card>
+                ))}
+            </SimpleGrid>
+        </Container>
+    );
 }
