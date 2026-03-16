@@ -1,20 +1,25 @@
-import { PLANT_DATA } from '@/data/plants';
+import { fetchPlantById } from '@/data/api';
 import { notFound } from 'next/navigation';
-import PlantDetail from './PlantDetail';
+import PlantDetailPageClient from './PlantDetailPageClient';
 
-// Note the 'async' and the 'await params'
 export default async function Page({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params; // You must await params now!
-  const plant = PLANT_DATA[id];
+  const { id } = await params;
+  let plant = null;
+
+  try {
+    plant = await fetchPlantById(id);
+  } catch (error) {
+    console.error(`Error fetching plant ${id}:`, error);
+  }
 
   if (!plant) {
-    console.log(`Plant ID "${id}" not found in PLANT_DATA`);
+    console.log(`Plant ID "${id}" not found`);
     notFound();
   }
 
-  return <PlantDetail plant={plant} />;
+  return <PlantDetailPageClient plant={plant} plantId={id} />;
 }

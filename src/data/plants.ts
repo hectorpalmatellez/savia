@@ -1,6 +1,7 @@
 type Room = 'Living Room' | 'Bedroom' | 'Kitchen';
 
 export interface PlantData {
+  id?: string;
   common_name: string;
   scientific_name?: string;
   location: Room;

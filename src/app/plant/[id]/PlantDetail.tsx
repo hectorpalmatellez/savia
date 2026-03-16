@@ -81,7 +81,7 @@ export default function PlantDetail({ plant }: { plant: PlantData }) {
               Último riego registrado:
             </Text>
             <Text size="sm" fw={700}>
-              {plant.care.last_watered}
+              {new Date(plant.care.last_watered).toLocaleDateString()}
             </Text>
           </Card>
         )}
