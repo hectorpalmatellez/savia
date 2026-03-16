@@ -2,6 +2,8 @@ import { fetchPlants } from '@/data/api';
 import { PlantData } from '@/data/plants';
 import HomePageClient from './HomePageClient';
 
+export const revalidate = 60;
+
 export default async function HomePage() {
   let allPlants: PlantData[] = [];
   let error: string | null = null;

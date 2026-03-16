@@ -2,6 +2,8 @@ import { fetchPlantById } from '@/data/api';
 import { notFound } from 'next/navigation';
 import PlantDetailPageClient from './PlantDetailPageClient';
 
+export const revalidate = 60;
+
 export default async function Page({
   params,
 }: {
