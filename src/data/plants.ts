@@ -1,11 +1,15 @@
-type Room = 'Living Room' | 'Bedroom' | 'Kitchen';
+type Room = 'Living Room' | 'Bedroom' | 'Kitchen' | 'Dormitorio' | 'Balcón';
+
+export type PlantStatus = 'Viva' | 'Débil' | 'Muerta' | null | undefined;
 
 export interface PlantData {
   id?: string;
   common_name: string;
   scientific_name?: string;
+  category?: string;
   location: Room;
   placement?: string;
+  status?: PlantStatus;
   requirements: {
     light: string;
     water: string;

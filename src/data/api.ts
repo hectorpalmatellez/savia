@@ -13,11 +13,13 @@ interface ApiPlantRecord {
   ID: string;
   Name?: string;
   Type?: string;
+  Category?: string | null;
   Latin?: string | null;
   Date?: string | null;
   Location?: string | null;
   Orientation?: string | null;
   Origin?: string | null;
+  Status?: string | null;
 }
 
 interface ApiResponse {
@@ -39,11 +41,27 @@ function mapApiPlantToPlantData(apiPlant: ApiPlantRecord): PlantData {
     id: apiPlant.ID,
     common_name: apiPlant.Name || 'Unknown Plant',
     scientific_name: apiPlant.Latin || undefined,
-    location: (apiPlant.Location || 'Living Room') as
+    category: apiPlant.Category || undefined,
+    location: (apiPlant.Location === 'Balcón' ||
+    apiPlant.Location === 'Dormitorio' ||
+    apiPlant.Location === 'Living'
+      ? apiPlant.Location === 'Dormitorio'
+        ? 'Dormitorio'
+        : (apiPlant.Location as
+            | 'Living Room'
+            | 'Bedroom'
+            | 'Kitchen'
+            | 'Balcón')
+      : 'Living Room') as
       | 'Living Room'
       | 'Bedroom'
-      | 'Kitchen',
+      | 'Kitchen'
+      | 'Dormitorio'
+      | 'Balcón',
     placement: apiPlant.Orientation || undefined,
+    status:
+      (apiPlant.Status as 'Viva' | 'Débil' | 'Muerta' | null | undefined) ||
+      undefined,
     requirements: {
       light: apiPlant.Type === 'Interior' ? 'Indirect' : 'Bright',
       water: 'Weekly',

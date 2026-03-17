@@ -66,9 +66,26 @@ export default function HomePageClient({ plants, error }: HomePageClientProps) {
               <Group justify="space-between" mt="md" mb="xs">
                 {/* Fallback to the ID if common_name is missing */}
                 <Text fw={700}>{plant.common_name || `ID: ${plant.id}`}</Text>
-                <Badge color="green" variant="light">
-                  {plant.location || 'Sin ubicación'}
-                </Badge>
+                <Group gap="xs">
+                  {plant.status && (
+                    <Badge
+                      color={
+                        plant.status === 'Viva'
+                          ? 'green'
+                          : plant.status === 'Débil'
+                            ? 'yellow'
+                            : 'red'
+                      }
+                      variant="light"
+                      size="sm"
+                    >
+                      {plant.status}
+                    </Badge>
+                  )}
+                  <Badge color="blue" variant="light">
+                    {plant.location || 'Sin ubicación'}
+                  </Badge>
+                </Group>
               </Group>
 
               <Stack gap={4} mb="md">

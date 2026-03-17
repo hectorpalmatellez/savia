@@ -31,11 +31,38 @@ export default function PlantDetail({ plant }: { plant: PlantData }) {
               {plant.scientific_name}
             </Text>
           )}
+          {plant.category && (
+            <Text c="dimmed" fz="xs" fw={500}>
+              📂 {plant.category}
+            </Text>
+          )}
         </Stack>
 
-        <Badge color="green" variant="light" size="lg">
-          📍 {plant.location} {plant.placement ? `• ${plant.placement}` : ''}
-        </Badge>
+        <Stack gap={2}>
+          <Badge color="blue" variant="light" size="lg">
+            📍 {plant.location} {plant.placement ? `• ${plant.placement}` : ''}
+          </Badge>
+          {plant.status && (
+            <Badge
+              color={
+                plant.status === 'Viva'
+                  ? 'green'
+                  : plant.status === 'Débil'
+                    ? 'yellow'
+                    : 'red'
+              }
+              variant="light"
+              size="lg"
+            >
+              {plant.status === 'Viva'
+                ? '✅ '
+                : plant.status === 'Débil'
+                  ? '⚠️ '
+                  : '❌ '}
+              {plant.status}
+            </Badge>
+          )}
+        </Stack>
 
         <Divider label="Requerimientos" labelPosition="center" />
 
