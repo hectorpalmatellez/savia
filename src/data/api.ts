@@ -3,6 +3,9 @@ import { PlantData } from './plants';
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const API_KEY = process.env.API_KEY;
 
+// Vercel Blob storage base URL for plant images
+const BLOB_BASE_URL = 'https://bfvid4lplyqsxghx.public.blob.vercel-storage.com/plants/';
+
 if (!API_URL) {
   throw new Error('NEXT_PUBLIC_API_URL environment variable is not set');
 }
@@ -20,6 +23,7 @@ interface ApiPlantRecord {
   Orientation?: string | null;
   Origin?: string | null;
   Status?: string | null;
+  Photo?: string | null;
 }
 
 interface ApiResponse {
@@ -72,7 +76,12 @@ function mapApiPlantToPlantData(apiPlant: ApiPlantRecord): PlantData {
       apiPlant.Date && apiPlant.Date.trim()
         ? { last_watered: new Date(apiPlant.Date) }
         : undefined,
-    image: undefined,
+    /**
+     * The full path to an image is constructed by adding the BLOB_BASE_URL prefix
+     * to the file name provided in the ApiPlantRecord.Photo property.
+     * Example: https://bfvid4lplyqsxghx.public.blob.vercel-storage.com/plants/20260316_131049.jpg
+     */
+    image: apiPlant.Photo ? `${BLOB_BASE_URL}${apiPlant.Photo}` : undefined,
   };
 }
 
