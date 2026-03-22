@@ -44,13 +44,20 @@ export default function HomePageClient({ plants, error }: HomePageClientProps) {
         {plants.length === 0 ? (
           <Text c="dimmed">No plants available</Text>
         ) : (
-          plants.map(plant => (
+          plants
+            .filter(plant => plant.sensor === true)
+            .map(plant => (
             <Card
               key={plant.id}
               shadow="sm"
               padding="lg"
               radius="md"
               withBorder
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%',
+              }}
             >
               {/* Image with a guaranteed height */}
               <CardSection>
@@ -63,49 +70,89 @@ export default function HomePageClient({ plants, error }: HomePageClientProps) {
                 />
               </CardSection>
 
-              <Group justify="space-between" mt="md" mb="xs">
-                {/* Fallback to the ID if common_name is missing */}
-                <Text fw={700}>{plant.common_name || `ID: ${plant.id}`}</Text>
-                <Group gap="xs">
-                  {plant.status && (
-                    <Badge
-                      color={
-                        plant.status === 'Viva'
-                          ? 'green'
-                          : plant.status === 'Débil'
-                            ? 'yellow'
-                            : 'red'
-                      }
-                      variant="light"
-                      size="sm"
-                    >
-                      {plant.status}
-                    </Badge>
-                  )}
-                  <Badge color="blue" variant="light">
-                    {plant.location || 'Sin ubicación'}
-                  </Badge>
-                </Group>
-              </Group>
+              <Stack
+                gap="md"
+                mt="md"
+                mb="xl"
+                style={{ flex: 1, justifyContent: 'space-between' }}
+              >
+                <div>
+                  <Group justify="space-between" mb="xs">
+                    <div>
+                      <Text fw={700}>
+                        {plant.common_name || `ID: ${plant.id}`}
+                      </Text>
+                      {plant.scientific_name && (
+                        <Text size="xs" c="dimmed" fs="italic">
+                          {plant.scientific_name}
+                        </Text>
+                      )}
+                    </div>
+                    <Group gap="xs">
+                      {plant.status && (
+                        <Badge
+                          color={
+                            plant.status === 'Viva'
+                              ? 'green'
+                              : plant.status === 'Débil'
+                                ? 'yellow'
+                                : 'red'
+                          }
+                          variant="light"
+                          size="sm"
+                        >
+                          {plant.status}
+                        </Badge>
+                      )}
+                      <Badge color="blue" variant="light">
+                        {plant.location || 'Sin ubicación'}
+                      </Badge>
+                    </Group>
+                  </Group>
 
-              <Stack gap={4} mb="md">
-                <Text size="sm" c="dimmed">
-                  ☀️ Luz:{' '}
-                  <strong>
-                    {plant.requirements?.light || 'No especificada'}
-                  </strong>
-                </Text>
-                <Text size="sm" c="dimmed">
-                  💧 Riego:{' '}
-                  <strong>
-                    {plant.requirements?.water || 'No especificado'}
-                  </strong>
-                </Text>
+                  {plant.category && (
+                    <Text size="xs" fw={500} mb="xs">
+                      📂 {plant.category}
+                    </Text>
+                  )}
+
+                  {plant.placement && (
+                    <Text size="xs" c="dimmed" mb="xs">
+                      📍 {plant.placement}
+                    </Text>
+                  )}
+
+                  <Stack gap={4}>
+                    <Text size="sm" c="dimmed">
+                      ☀️ Luz:{' '}
+                      <strong>
+                        {plant.requirements?.light || 'No especificada'}
+                      </strong>
+                    </Text>
+                    <Text size="sm" c="dimmed">
+                      💧 Riego:{' '}
+                      <strong>
+                        {plant.requirements?.water || 'No especificado'}
+                      </strong>
+                    </Text>
+                    {plant.requirements?.humidity && (
+                      <Text size="sm" c="dimmed">
+                        🌫️ Humedad:{' '}
+                        <strong>{plant.requirements.humidity}</strong>
+                      </Text>
+                    )}
+                    {plant.requirements?.soil && (
+                      <Text size="sm" c="dimmed">
+                        🌱 Suelo: <strong>{plant.requirements.soil}</strong>
+                      </Text>
+                    )}
+                  </Stack>
+                </div>
               </Stack>
 
               <Link
                 href={`/plant/${plant.id}`}
-                style={{ textDecoration: 'none' }}
+                style={{ textDecoration: 'none', marginTop: 'auto' }}
               >
                 <Button
                   component="div" // Necessary to avoid nested anchor tags

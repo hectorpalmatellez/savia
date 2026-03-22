@@ -24,6 +24,7 @@ interface ApiPlantRecord {
   Origin?: string | null;
   Status?: string | null;
   Photo?: string | null;
+  Sensor?: string | null;
 }
 
 interface ApiResponse {
@@ -82,6 +83,7 @@ function mapApiPlantToPlantData(apiPlant: ApiPlantRecord): PlantData {
      * Example: https://bfvid4lplyqsxghx.public.blob.vercel-storage.com/plants/20260316_131049.jpg
      */
     image: apiPlant.Photo ? `${BLOB_BASE_URL}${apiPlant.Photo}` : undefined,
+    sensor: apiPlant.Sensor === 'TRUE',
   };
 }
 

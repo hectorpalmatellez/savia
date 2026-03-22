@@ -21,6 +21,7 @@ export interface PlantData {
     last_fertilized?: Date;
   };
   image?: string;
+  sensor?: boolean;
 }
 
 export const PLANT_DATA: Record<string, PlantData> = {
