@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { PlantData } from '@/data/plants';
 import { setCachedPlants } from '@/data/cache';
@@ -15,6 +15,8 @@ import {
   Button,
   Text,
   Stack,
+  TextInput,
+  SegmentedControl,
 } from '@mantine/core';
 
 interface HomePageClientProps {
@@ -23,12 +25,31 @@ interface HomePageClientProps {
 }
 
 export default function HomePageClient({ plants, error }: HomePageClientProps) {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('Todas');
+
   useEffect(() => {
     // Cache plants when page loads
     if (plants.length > 0) {
       setCachedPlants(plants);
     }
   }, [plants]);
+
+  const filteredPlants = plants.filter((plant) => {
+    const query = searchQuery.toLowerCase();
+    const nameMatch = plant.common_name?.toLowerCase().includes(query) ?? false;
+    const scientificMatch = plant.scientific_name?.toLowerCase().includes(query) ?? false;
+    const searchMatch = query ? (nameMatch || scientificMatch) : true;
+
+    let statusMatch = true;
+    if (statusFilter === 'Vivas') {
+      statusMatch = plant.status === 'Viva';
+    } else if (statusFilter === 'Muertas') {
+      statusMatch = plant.status === 'Muerta';
+    }
+
+    return searchMatch && statusMatch;
+  });
 
   if (error && plants.length === 0) {
     return (
@@ -40,12 +61,30 @@ export default function HomePageClient({ plants, error }: HomePageClientProps) {
 
   return (
     <Container size="md" py="xl">
+      <Group mb="xl">
+        <TextInput
+          placeholder="Buscar plantas por nombre o nombre científico..."
+          value={searchQuery}
+          onChange={(event) => setSearchQuery(event.currentTarget.value)}
+          size="md"
+          radius="md"
+          style={{ flex: 1 }}
+        />
+        <SegmentedControl
+          data={['Todas', 'Vivas', 'Muertas']}
+          value={statusFilter}
+          onChange={setStatusFilter}
+          size="md"
+          radius="md"
+        />
+      </Group>
+
       <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
-        {plants.length === 0 ? (
+        {filteredPlants.length === 0 ? (
           <Text c="dimmed">No plants available</Text>
         ) : (
-          plants
-            .filter(plant => plant.sensor === true)
+          filteredPlants
+            // .filter(plant => plant.sensor === true)
             .map(plant => (
             <Card
               key={plant.id}
@@ -122,31 +161,6 @@ export default function HomePageClient({ plants, error }: HomePageClientProps) {
                     </Text>
                   )}
 
-                  <Stack gap={4}>
-                    <Text size="sm" c="dimmed">
-                      ☀️ Luz:{' '}
-                      <strong>
-                        {plant.requirements?.light || 'No especificada'}
-                      </strong>
-                    </Text>
-                    <Text size="sm" c="dimmed">
-                      💧 Riego:{' '}
-                      <strong>
-                        {plant.requirements?.water || 'No especificado'}
-                      </strong>
-                    </Text>
-                    {plant.requirements?.humidity && (
-                      <Text size="sm" c="dimmed">
-                        🌫️ Humedad:{' '}
-                        <strong>{plant.requirements.humidity}</strong>
-                      </Text>
-                    )}
-                    {plant.requirements?.soil && (
-                      <Text size="sm" c="dimmed">
-                        🌱 Suelo: <strong>{plant.requirements.soil}</strong>
-                      </Text>
-                    )}
-                  </Stack>
                 </div>
               </Stack>
 

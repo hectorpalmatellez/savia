@@ -4,11 +4,9 @@ import {
   Title,
   Text,
   Image,
-  SimpleGrid,
   Card,
   Badge,
   Stack,
-  Divider,
   Group,
   AspectRatio,
   Button,
@@ -18,6 +16,16 @@ import { useDisclosure } from '@mantine/hooks';
 import { PlantData } from '@/data/plants';
 import { useEffect, useState } from 'react';
 import EXIF from 'exif-js';
+
+const formatDate = (dateString: Date | string) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return String(dateString);
+  const day = date.getDate();
+  const month = date.toLocaleDateString('es-ES', { month: 'long' });
+  const year = date.getFullYear();
+  return `${day} de ${month}, ${year}`;
+};
 
 export default function PlantDetail({ plant }: { plant: PlantData }) {
   const [photoDate, setPhotoDate] = useState<string | null>(null);
@@ -29,13 +37,12 @@ export default function PlantDetail({ plant }: { plant: PlantData }) {
       img.crossOrigin = 'Anonymous';
       img.src = plant.image;
       img.onload = function () {
-        EXIF.getData(img as any, function (this: any) {
-          const allExif = EXIF.getAllTags(this);
-          console.log('EXIF data:', allExif);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        EXIF.getData(img as any, () => {
           const dateStr =
-            EXIF.getTag(this, 'DateTimeOriginal') ||
-            EXIF.getTag(this, 'CreateDate') ||
-            EXIF.getTag(this, 'ModifyDate');
+            EXIF.getTag(img, 'DateTimeOriginal') ||
+            EXIF.getTag(img, 'CreateDate') ||
+            EXIF.getTag(img, 'ModifyDate');
 
           if (dateStr) {
             // EXIF date format is usually "YYYY:MM:DD HH:MM:SS"
@@ -43,7 +50,13 @@ export default function PlantDetail({ plant }: { plant: PlantData }) {
             const parts = dateStr.split(' ');
             if (parts.length > 0) {
               const datePart = parts[0].replace(/:/g, '-');
-              setPhotoDate(datePart);
+              const [year, month, day] = datePart.split('-');
+              if (year && month && day) {
+                const dateObj = new Date(Number(year), Number(month) - 1, Number(day));
+                setPhotoDate(formatDate(dateObj));
+              } else {
+                setPhotoDate(datePart);
+              }
             }
           }
         });
@@ -79,7 +92,7 @@ export default function PlantDetail({ plant }: { plant: PlantData }) {
                 ? '✅ '
                 : plant.status === 'Débil'
                   ? '⚠️ '
-                  : '❌ '}
+                  : '💀 '}
               {plant.status}
             </Badge>
           )}
@@ -101,9 +114,11 @@ export default function PlantDetail({ plant }: { plant: PlantData }) {
           ) : (
             <div />
           )}
-          <Button variant="subtle" size="compact-xs" onClick={open}>
-            Ver imagen completa
-          </Button>
+          {plant.image && (
+            <Button variant="subtle" size="compact-xs" onClick={open}>
+              Ver imagen completa
+            </Button>
+          )}
         </Group>
 
         <Modal
@@ -129,9 +144,9 @@ export default function PlantDetail({ plant }: { plant: PlantData }) {
               {plant.scientific_name}
             </Text>
           )}
-          {plant.category && (
+          {(plant.category || plant.type) && (
             <Text c="dimmed" fz="xs" fw={500}>
-              📂 {plant.category}
+              📂 {[plant.category, plant.type].filter(Boolean).join(' • ')}
             </Text>
           )}
         </Stack>
@@ -156,58 +171,36 @@ export default function PlantDetail({ plant }: { plant: PlantData }) {
                 ? '✅ '
                 : plant.status === 'Débil'
                   ? '⚠️ '
-                  : '❌ '}
+                  : '💀 '}
               {plant.status}
             </Badge>
           )}
         </Stack>
 
-        <Divider label="Requerimientos" labelPosition="center" />
 
-        <SimpleGrid cols={2}>
-          <Card withBorder radius="md">
-            <Text fw={700} size="xs" c="blue" tt="uppercase">
-              💧 Riego
-            </Text>
-            <Text size="md">{plant.requirements.water}</Text>
-          </Card>
-
-          <Card withBorder radius="md">
-            <Text fw={700} size="xs" c="orange" tt="uppercase">
-              ☀️ Luz
-            </Text>
-            <Text size="md">{plant.requirements.light}</Text>
-          </Card>
-
-          {/* Conditional Requirements */}
-          {plant.requirements.humidity && (
-            <Card withBorder radius="md">
-              <Text fw={700} size="xs" c="cyan" tt="uppercase">
-                ☁️ Humedad
-              </Text>
-              <Text size="md">{plant.requirements.humidity}</Text>
-            </Card>
-          )}
-
-          {plant.requirements.soil && (
-            <Card withBorder radius="md">
-              <Text fw={700} size="xs" c="brown" tt="uppercase">
-                🪴 Suelo
-              </Text>
-              <Text size="md">{plant.requirements.soil}</Text>
-            </Card>
-          )}
-        </SimpleGrid>
-
-        {/* Care History Section */}
-        {plant.care?.last_watered && (
+        {/* Acquisition Section */}
+        {(plant.origin || plant.price || plant.purchase_date) && (
           <Card withBorder padding="sm" radius="md" bg="gray.0">
-            <Text size="xs" fw={500} c="dimmed">
-              Último riego registrado:
+            <Text size="xs" fw={500} c="dimmed" mb={5}>
+              Datos de adquisición:
             </Text>
-            <Text size="sm" fw={700}>
-              {new Date(plant.care.last_watered).toLocaleDateString()}
-            </Text>
+            <Stack gap={2}>
+              {plant.purchase_date && (
+                <Text size="sm" fw={500}>
+                  📅 Fecha: <Text component="span" fw={700}>{formatDate(plant.purchase_date)}</Text>
+                </Text>
+              )}
+              {plant.origin && (
+                <Text size="sm" fw={500}>
+                  🏷️ Origen: <Text component="span" fw={700}>{plant.origin}</Text>
+                </Text>
+              )}
+              {plant.price && (
+                <Text size="sm" fw={500}>
+                  💰 Precio: <Text component="span" fw={700}>{plant.price}</Text>
+                </Text>
+              )}
+            </Stack>
           </Card>
         )}
       </Stack>

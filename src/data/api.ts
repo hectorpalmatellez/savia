@@ -25,6 +25,7 @@ interface ApiPlantRecord {
   Status?: string | null;
   Photo?: string | null;
   Sensor?: string | null;
+  Precio?: string | null;
 }
 
 interface ApiResponse {
@@ -44,9 +45,13 @@ interface ApiResponse {
 function mapApiPlantToPlantData(apiPlant: ApiPlantRecord): PlantData {
   return {
     id: apiPlant.ID,
+    row: apiPlant._row,
     common_name: apiPlant.Name || 'Unknown Plant',
     scientific_name: apiPlant.Latin || undefined,
     category: apiPlant.Category || undefined,
+    type: apiPlant.Type || undefined,
+    origin: apiPlant.Origin || undefined,
+    price: apiPlant.Precio || undefined,
     location: (apiPlant.Location === 'Balcón' ||
     apiPlant.Location === 'Dormitorio' ||
     apiPlant.Location === 'Living'
@@ -67,15 +72,9 @@ function mapApiPlantToPlantData(apiPlant: ApiPlantRecord): PlantData {
     status:
       (apiPlant.Status as 'Viva' | 'Débil' | 'Muerta' | null | undefined) ||
       undefined,
-    requirements: {
-      light: apiPlant.Type === 'Interior' ? 'Indirect' : 'Bright',
-      water: 'Weekly',
-      humidity: undefined,
-      soil: undefined,
-    },
-    care:
+    purchase_date:
       apiPlant.Date && apiPlant.Date.trim()
-        ? { last_watered: new Date(apiPlant.Date) }
+        ? new Date(apiPlant.Date)
         : undefined,
     /**
      * The full path to an image is constructed by adding the BLOB_BASE_URL prefix
