@@ -12,7 +12,7 @@ export default async function HomePage() {
     const plants = await fetchPlants();
     allPlants = plants.map((plant, index) => ({
       ...plant,
-      id: plant.id || `plant-${index}`,
+      id: plant.id || index.toString(),
     }));
   } catch (err) {
     error = err instanceof Error ? err.message : 'Error fetching plants';

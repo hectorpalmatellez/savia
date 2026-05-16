@@ -100,6 +100,9 @@ export default function HomePageClient({ plants, error }: HomePageClientProps) {
             >
               {/* Image with a guaranteed height */}
               <CardSection>
+                <Link
+                    href={`/plant/${plant.id}`}
+                >
                 <Image
                   src={
                     plant.image || 'https://placehold.co/600x400?text=No+Photo'
@@ -107,6 +110,7 @@ export default function HomePageClient({ plants, error }: HomePageClientProps) {
                   height={160}
                   alt={plant.common_name || 'Planta'}
                 />
+                </Link>
               </CardSection>
 
               <Stack

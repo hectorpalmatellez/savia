@@ -13,7 +13,7 @@ if (!API_URL) {
 // Type for raw API response
 interface ApiPlantRecord {
   _row: number;
-  ID: string;
+  ID?: string;
   Name?: string;
   Type?: string;
   Category?: string | null;
@@ -42,9 +42,9 @@ interface ApiResponse {
 /**
  * Maps API response format to PlantData format
  */
-function mapApiPlantToPlantData(apiPlant: ApiPlantRecord): PlantData {
+function mapApiPlantToPlantData(apiPlant: ApiPlantRecord, index: number): PlantData {
   return {
-    id: apiPlant.ID,
+    id: apiPlant.ID || index.toString(),
     row: apiPlant._row,
     common_name: apiPlant.Name || 'Unknown Plant',
     scientific_name: apiPlant.Latin || undefined,
@@ -108,7 +108,7 @@ export async function fetchPlants(): Promise<PlantData[]> {
       throw new Error('API returned success: false');
     }
 
-    return (data.data || []).map(apiPlant => mapApiPlantToPlantData(apiPlant));
+    return (data.data || []).map((apiPlant, index) => mapApiPlantToPlantData(apiPlant, index));
   } catch (error) {
     console.error('Error fetching plants from API:', error);
     throw error;
@@ -142,9 +142,11 @@ export async function fetchPlantById(id: string): Promise<PlantData | null> {
       throw new Error('API returned success: false');
     }
 
-    // Find the plant by ID in the response
-    const apiPlant = (data.data || []).find(plant => plant.ID === id);
-    return apiPlant ? mapApiPlantToPlantData(apiPlant) : null;
+    // Find the plant by index in the response since ID is removed
+    const index = parseInt(id, 10);
+    const apiPlants = data.data || [];
+    const apiPlant = !isNaN(index) && index >= 0 && index < apiPlants.length ? apiPlants[index] : undefined;
+    return apiPlant ? mapApiPlantToPlantData(apiPlant, index) : null;
   } catch (error) {
     console.error(`Error fetching plant ${id} from API:`, error);
     throw error;
