@@ -16,25 +16,26 @@ Guidance for AI agents working on the `savia` codebase.
 
 | Layer        | Technology                                                                                               |
 | ------------ | -------------------------------------------------------------------------------------------------------- |
-| Framework    | Next.js 16.1.6 (App Router, Turbopack-compatible)                                                        |
-| UI           | React 19.2.3, Mantine v8 (`@mantine/core`, `@mantine/hooks`)                                             |
+| Framework    | Next.js 16.2 (App Router, Turbopack-compatible)                                                          |
+| UI           | React 19.2, Mantine v8 (`@mantine/core`, `@mantine/hooks`)                                               |
 | Language     | TypeScript 5, `strict: true`                                                                             |
 | Styling      | Mantine inline props + `postcss-preset-mantine` (`postcss.config.mjs` defines all 5 Mantine breakpoints) |
 | Images       | `@vercel/blob` (public storage), `exif-js` for EXIF dates                                                |
 | Build extras | React Compiler enabled (`next.config.ts` → `reactCompiler: true`)                                        |
 | Deployment   | Vercel (`.vercel/project.json`)                                                                          |
-| Tooling      | ESLint 9 flat config, Prettier 3, `tsx` for scripts                                                      |
+| Tooling      | pnpm (lockfile `pnpm-lock.yaml`), ESLint 9 flat config, Prettier 3, `tsx` for scripts                    |
 
 ## Commands
 
 ```bash
-npm run dev          # start dev server
-npm run build        # production build
-npm run start        # serve production build
-npm run lint         # eslint (flat config)
-npm run format       # prettier --write .
-npm run format:check # prettier --check .
-npm run upload:img   # npx tsx scripts/upload-images.ts
+pnpm dev          # start dev server
+pnpm build        # production build
+pnpm start        # serve production build
+pnpm lint         # eslint (flat config)
+pnpm typecheck    # tsc --noEmit
+pnpm format       # prettier --write .
+pnpm format:check # prettier --check .
+pnpm upload:img   # pnpm exec tsx scripts/upload-images.ts
 ```
 
 ## Environment variables
@@ -91,7 +92,7 @@ Every route follows the same three-layer pattern:
 ### Image pipeline
 
 1. Phone photos are dropped into `./img/`.
-2. `npm run upload:img` (`scripts/upload-images.ts`) uploads each image to Vercel Blob at `plants/<filename>` (public access) using `savia_READ_WRITE_TOKEN`, printing the resulting URLs.
+2. `pnpm upload:img` (`scripts/upload-images.ts`) uploads each image to Vercel Blob at `plants/<filename>` (public access) using `savia_READ_WRITE_TOKEN`, printing the resulting URLs.
 3. The `Photo` column in the remote API stores the filename; the app reconstructs the full URL.
 
 EXIF dates are read client-side in `PlantDetail.tsx` (`DateTimeOriginal` / `CreateDate` / `ModifyDate`) with `img.crossOrigin = 'Anonymous'`.

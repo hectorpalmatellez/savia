@@ -34,4 +34,4 @@ Feature proposals for `savia`, grouped by impact/effort. Items in the same group
 - **Enable the sensor filter.** Done — "Todos / Con sensor / Sin sensor" SegmentedControl on the grid.
 - **Dark mode toggle.** Done — `ThemeToggle.tsx` in the header (Mantine `useMantineColorScheme`, persisted automatically).
 - **Replace README.md boilerplate.** Done — project description, setup, env-var table, scripts, image pipeline, architecture summary.
-- **Add lint + typecheck to CI.** Done — `.github/workflows/ci.yml` runs lint, typecheck and format:check (new `npm run typecheck` script).
+- **Add lint + typecheck to CI.** Done — `.github/workflows/ci.yml` runs lint, typecheck and format:check (new `pnpm typecheck` script).

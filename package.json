@@ -2,6 +2,7 @@
   "name": "savia",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@11.17.0",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -10,7 +11,7 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "upload:img": "npx tsx scripts/upload-images.ts"
+    "upload:img": "pnpm exec tsx scripts/upload-images.ts"
   },
   "dependencies": {
     "@mantine/core": "^8.3.17",

@@ -63,16 +63,9 @@ function mapApiPlantToPlantData(
       ? apiPlant.Location === 'Dormitorio'
         ? 'Dormitorio'
         : (apiPlant.Location as
-            | 'Living Room'
-            | 'Bedroom'
-            | 'Kitchen'
-            | 'Balcón')
+            'Living Room' | 'Bedroom' | 'Kitchen' | 'Balcón')
       : 'Living Room') as
-      | 'Living Room'
-      | 'Bedroom'
-      | 'Kitchen'
-      | 'Dormitorio'
-      | 'Balcón',
+      'Living Room' | 'Bedroom' | 'Kitchen' | 'Dormitorio' | 'Balcón',
     placement: apiPlant.Orientation || undefined,
     status:
       (apiPlant.Status as 'Viva' | 'Débil' | 'Muerta' | null | undefined) ||
