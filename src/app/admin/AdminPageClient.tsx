@@ -10,11 +10,16 @@ import {
   Group,
   Modal,
   Stack,
+  Switch,
   Table,
   Text,
   Title,
 } from '@mantine/core';
-import { csvFieldsToPlantForm, formatPrice } from '@/data/plant-form';
+import {
+  csvFieldsToPlantForm,
+  emptyPlantForm,
+  formatPrice,
+} from '@/data/plant-form';
 import type { PlantFormInput } from '@/data/plant-form';
 import PlantForm from './PlantForm';
 import { createPlant, deletePlant, updatePlant } from './actions';
@@ -62,12 +67,32 @@ export default function AdminPageClient({
   const router = useRouter();
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<RowView | null>(null);
+  const [propagating, setPropagating] = useState<RowView | null>(null);
   const [deleting, setDeleting] = useState<RowView | null>(null);
   const [busy, setBusy] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [warnings, setWarnings] = useState<string[]>([]);
+  const [hideDead, setHideDead] = useState(true);
 
   const plants = rows.map(toRowView);
+  const visiblePlants = hideDead
+    ? plants.filter(plant => plant.status !== 'Muerta')
+    : plants;
+
+  const parentName = (parentId?: string) =>
+    parentId
+      ? plants.find(plant => String(plant.id) === parentId)?.name
+      : undefined;
+
+  const parentOptions = (excludeId?: number, orphanId?: string) => {
+    const options = plants
+      .filter(plant => plant.id !== excludeId)
+      .map(plant => ({ value: String(plant.id), label: plant.name }));
+    if (orphanId && !options.some(option => option.value === orphanId)) {
+      options.push({ value: orphanId, label: `ID ${orphanId}` });
+    }
+    return options;
+  };
 
   async function run(
     action: () => Promise<ActionResult>,
@@ -89,6 +114,7 @@ export default function AdminPageClient({
     setCreating(false);
     setEditing(null);
     setDeleting(null);
+    setPropagating(null);
     router.refresh();
   }
 
@@ -98,14 +124,26 @@ export default function AdminPageClient({
         <div>
           <Title order={2}>Administrar plantas</Title>
           <Text size="sm" c="dimmed">
-            Edita db/Plants.csv y regenera los datos ({plants.length} plantas)
+            Edita db/Plants.csv y regenera los datos (
+            {hideDead && visiblePlants.length !== plants.length
+              ? `${visiblePlants.length} de ${plants.length}`
+              : plants.length}{' '}
+            plantas)
           </Text>
         </div>
-        {!readOnly && (
-          <Button onClick={() => setCreating(true)} color="green">
-            Nueva planta
-          </Button>
-        )}
+        <Group>
+          <Switch
+            label="Ocultar muertas"
+            checked={hideDead}
+            onChange={event => setHideDead(event.currentTarget.checked)}
+            styles={{ label: { cursor: 'pointer' } }}
+          />
+          {!readOnly && (
+            <Button onClick={() => setCreating(true)} color="green">
+              Nueva planta
+            </Button>
+          )}
+        </Group>
       </Group>
 
       {readOnly && (
@@ -153,12 +191,13 @@ export default function AdminPageClient({
             <Table.Th>Ubicación</Table.Th>
             <Table.Th>Precio</Table.Th>
             <Table.Th>Sensor</Table.Th>
+            <Table.Th>Madre</Table.Th>
             <Table.Th>Foto</Table.Th>
             {!readOnly && <Table.Th ta="right">Acciones</Table.Th>}
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          {plants.map(plant => (
+          {visiblePlants.map(plant => (
             <Table.Tr key={plant.id}>
               <Table.Td>{plant.id}</Table.Td>
               <Table.Td fw={500}>{plant.name}</Table.Td>
@@ -172,6 +211,15 @@ export default function AdminPageClient({
               <Table.Td>{plant.location}</Table.Td>
               <Table.Td>{plant.price}</Table.Td>
               <Table.Td>{plant.sensor ? 'Sí' : 'No'}</Table.Td>
+              <Table.Td>
+                {parentName(plant.form.parentId) ? (
+                  <Text size="xs" c="dimmed">
+                    {parentName(plant.form.parentId)}
+                  </Text>
+                ) : (
+                  ''
+                )}
+              </Table.Td>
               <Table.Td>
                 {plant.photo ? (
                   <Text size="xs" c="dimmed" style={{ wordBreak: 'break-all' }}>
@@ -190,6 +238,14 @@ export default function AdminPageClient({
                       onClick={() => setEditing(plant)}
                     >
                       Editar
+                    </Button>
+                    <Button
+                      size="xs"
+                      variant="light"
+                      color="teal"
+                      onClick={() => setPropagating(plant)}
+                    >
+                      Propagar
                     </Button>
                     <Button
                       size="xs"
@@ -216,6 +272,7 @@ export default function AdminPageClient({
         <PlantForm
           key="create"
           initial={undefined}
+          parentOptions={parentOptions()}
           busy={busy}
           onSubmit={input => run(() => createPlant(input), 'Planta creada.')}
           onCancel={() => setCreating(false)}
@@ -232,11 +289,37 @@ export default function AdminPageClient({
           <PlantForm
             key={`edit-${editing.id}`}
             initial={editing.form}
+            parentOptions={parentOptions(editing.id, editing.form.parentId)}
             busy={busy}
             onSubmit={input =>
               run(() => updatePlant(editing.id, input), 'Planta actualizada.')
             }
             onCancel={() => setEditing(null)}
+          />
+        )}
+      </Modal>
+
+      <Modal
+        opened={propagating !== null}
+        onClose={() => setPropagating(null)}
+        title={`Propagar desde «${propagating?.name ?? ''}»`}
+        size="lg"
+      >
+        {propagating && (
+          <PlantForm
+            key={`propagate-${propagating.id}`}
+            initial={{
+              ...emptyPlantForm(),
+              name: `${propagating.name} (corte)`,
+              status: 'Viva',
+              parentId: String(propagating.id),
+            }}
+            parentOptions={parentOptions()}
+            busy={busy}
+            onSubmit={input =>
+              run(() => createPlant(input), 'Propagación creada.')
+            }
+            onCancel={() => setPropagating(null)}
           />
         )}
       </Modal>

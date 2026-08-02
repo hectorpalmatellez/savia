@@ -1,10 +1,18 @@
 'use client';
 
+import { useSyncExternalStore } from 'react';
 import { ActionIcon, useMantineColorScheme } from '@mantine/core';
+
+const emptySubscribe = () => () => {};
 
 export default function ThemeToggle() {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
-  const dark = colorScheme === 'dark';
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
+  const dark = mounted && colorScheme === 'dark';
 
   return (
     <ActionIcon
@@ -13,9 +21,15 @@ export default function ThemeToggle() {
       size="lg"
       radius="md"
       onClick={() => toggleColorScheme()}
-      aria-label={dark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+      aria-label={
+        mounted
+          ? dark
+            ? 'Cambiar a modo claro'
+            : 'Cambiar a modo oscuro'
+          : 'Cambiar modo'
+      }
     >
-      {dark ? '☀️' : '🌙'}
+      {mounted ? (dark ? '☀️' : '🌙') : null}
     </ActionIcon>
   );
 }

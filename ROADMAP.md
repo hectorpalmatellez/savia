@@ -26,6 +26,6 @@ Feature proposals for `savia`, grouped by impact/effort. Items in the same group
 6. **CI checks.** `.github/workflows/ci.yml` runs lint, typecheck and format:check (`pnpm typecheck` script added).
 7. **Stable plant identity.** Explicit `ID` column in `db/Plants.csv`; IDs survive reorders/deletes; `getPlantById` falls back to row numbers so legacy links still resolve.
 8. **Plant management UI (data).** `/admin` (dev-only) CRUD for `db/Plants.csv` via server actions; production renders a read-only notice.
-9. **Admin photo upload.** File picker in the admin plant form uploads the photo to `./img` via a server action and auto-fills the Photo field. Publishing to Blob still requires `pnpm upload:img`.
+9. **Admin photo upload.** File picker in the admin plant form uploads the photo via a server action: compressed in place into `./img` (sharp) and published straight to Vercel Blob, then auto-fills the Photo field.
 10. **Location normalization.** `csv.ts` maps location synonyms to a single vocabulary (`LOCATION_MAP`), warning and defaulting unknown values to "Living Room".
 11. **Image optimization.** `scripts/upload-images.ts` re-encodes photos in place with sharp (1600px cap, quality 82 mozjpeg / 80 webp, PNG lossless) preserving EXIF and baking orientation; `next/image` serves them (grid, detail hero, modal) with remote patterns for Blob and placehold.co.

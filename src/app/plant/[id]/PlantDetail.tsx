@@ -113,6 +113,7 @@ export default function PlantDetail({ plant }: { plant: PlantData }) {
           <NextImage
             src={plant.image || 'https://placehold.co/600x400?text=Sin+Foto'}
             fill
+            unoptimized={!plant.image}
             sizes="(max-width: 640px) 100vw, 576px"
             alt={plant.common_name || 'Planta'}
             style={{
@@ -148,6 +149,7 @@ export default function PlantDetail({ plant }: { plant: PlantData }) {
             <NextImage
               src={plant.image || 'https://placehold.co/600x400?text=Sin+Foto'}
               fill
+              unoptimized={!plant.image}
               sizes="(max-width: 768px) 100vw, 1100px"
               alt={plant.common_name || 'Planta'}
               style={{ objectFit: 'contain' }}

@@ -22,6 +22,7 @@ export const PLANT_HEADERS = [
   'Photo',
   'Sensor',
   'Precio',
+  'ParentID',
 ] as const;
 
 const BLOB_BASE_URL_FALLBACK =
@@ -210,6 +211,7 @@ export function plantRowToPlantData(
     status: (status || undefined) as PlantStatus,
     image: photo ? `${blobBaseUrl()}${photo}` : undefined,
     sensor: record.Sensor === 'TRUE',
+    parent_id: record.ParentID || undefined,
   };
 }
 

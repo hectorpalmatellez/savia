@@ -16,8 +16,10 @@ export const plants: PlantData[] = [
     placement: 'Suelo',
     purchase_date: new Date(2021, 0, 20),
     status: 'Viva',
-    image: undefined,
+    image:
+      'https://bfvid4lplyqsxghx.public.blob.vercel-storage.com/plants/20260802_133055.jpg',
     sensor: false,
+    parent_id: '2',
   },
   {
     id: '2',
@@ -34,6 +36,7 @@ export const plants: PlantData[] = [
     status: 'Viva',
     image: undefined,
     sensor: false,
+    parent_id: undefined,
   },
   {
     id: '3',
@@ -50,6 +53,7 @@ export const plants: PlantData[] = [
     status: 'Muerta',
     image: undefined,
     sensor: false,
+    parent_id: undefined,
   },
   {
     id: '4',
@@ -66,6 +70,7 @@ export const plants: PlantData[] = [
     status: 'Muerta',
     image: undefined,
     sensor: false,
+    parent_id: undefined,
   },
   {
     id: '5',
@@ -80,8 +85,10 @@ export const plants: PlantData[] = [
     placement: 'Suelo',
     purchase_date: new Date(2025, 1, 7),
     status: 'Viva',
-    image: undefined,
+    image:
+      'https://bfvid4lplyqsxghx.public.blob.vercel-storage.com/plants/20260802_152139.jpg',
     sensor: false,
+    parent_id: undefined,
   },
   {
     id: '6',
@@ -98,6 +105,7 @@ export const plants: PlantData[] = [
     status: 'Muerta',
     image: undefined,
     sensor: false,
+    parent_id: undefined,
   },
   {
     id: '7',
@@ -115,6 +123,7 @@ export const plants: PlantData[] = [
     image:
       'https://bfvid4lplyqsxghx.public.blob.vercel-storage.com/plants/20260516_180936.jpg',
     sensor: false,
+    parent_id: undefined,
   },
   {
     id: '8',
@@ -128,9 +137,10 @@ export const plants: PlantData[] = [
     location: 'Balcón',
     placement: 'Norte',
     purchase_date: new Date(2025, 6, 17),
-    status: 'Débil',
+    status: 'Viva',
     image: undefined,
     sensor: false,
+    parent_id: undefined,
   },
   {
     id: '9',
@@ -147,6 +157,7 @@ export const plants: PlantData[] = [
     status: 'Viva',
     image: undefined,
     sensor: false,
+    parent_id: undefined,
   },
   {
     id: '10',
@@ -163,6 +174,7 @@ export const plants: PlantData[] = [
     status: 'Viva',
     image: undefined,
     sensor: false,
+    parent_id: undefined,
   },
   {
     id: '11',
@@ -180,6 +192,7 @@ export const plants: PlantData[] = [
     image:
       'https://bfvid4lplyqsxghx.public.blob.vercel-storage.com/plants/20260516_181005.jpg',
     sensor: false,
+    parent_id: undefined,
   },
   {
     id: '12',
@@ -196,6 +209,7 @@ export const plants: PlantData[] = [
     status: 'Débil',
     image: undefined,
     sensor: false,
+    parent_id: undefined,
   },
   {
     id: '13',
@@ -212,6 +226,7 @@ export const plants: PlantData[] = [
     status: 'Viva',
     image: undefined,
     sensor: false,
+    parent_id: undefined,
   },
   {
     id: '14',
@@ -228,6 +243,7 @@ export const plants: PlantData[] = [
     status: 'Viva',
     image: undefined,
     sensor: false,
+    parent_id: undefined,
   },
   {
     id: '15',
@@ -244,6 +260,7 @@ export const plants: PlantData[] = [
     status: 'Viva',
     image: undefined,
     sensor: false,
+    parent_id: undefined,
   },
   {
     id: '16',
@@ -260,6 +277,7 @@ export const plants: PlantData[] = [
     status: 'Viva',
     image: undefined,
     sensor: false,
+    parent_id: undefined,
   },
   {
     id: '17',
@@ -274,8 +292,10 @@ export const plants: PlantData[] = [
     placement: 'Este',
     purchase_date: new Date(2026, 2, 14),
     status: 'Viva',
-    image: undefined,
+    image:
+      'https://bfvid4lplyqsxghx.public.blob.vercel-storage.com/plants/20260802_152151.jpg',
     sensor: false,
+    parent_id: undefined,
   },
   {
     id: '18',
@@ -293,6 +313,7 @@ export const plants: PlantData[] = [
     image:
       'https://bfvid4lplyqsxghx.public.blob.vercel-storage.com/plants/20260316_131049.jpg',
     sensor: true,
+    parent_id: undefined,
   },
   {
     id: '19',
@@ -309,6 +330,7 @@ export const plants: PlantData[] = [
     status: 'Viva',
     image: undefined,
     sensor: false,
+    parent_id: undefined,
   },
   {
     id: '20',
@@ -322,10 +344,11 @@ export const plants: PlantData[] = [
     location: 'Living Room',
     placement: 'Carrito',
     purchase_date: new Date(2026, 3, 8),
-    status: 'Débil',
+    status: 'Muerta',
     image:
       'https://bfvid4lplyqsxghx.public.blob.vercel-storage.com/plants/20260516_181034.jpg',
     sensor: false,
+    parent_id: undefined,
   },
   {
     id: '21',
@@ -340,8 +363,10 @@ export const plants: PlantData[] = [
     placement: 'Librero',
     purchase_date: new Date(2026, 3, 8),
     status: 'Viva',
-    image: undefined,
+    image:
+      'https://bfvid4lplyqsxghx.public.blob.vercel-storage.com/plants/20260802_152212.jpg',
     sensor: false,
+    parent_id: undefined,
   },
   {
     id: '22',
@@ -356,8 +381,10 @@ export const plants: PlantData[] = [
     placement: 'Carrito',
     purchase_date: new Date(2026, 3, 8),
     status: 'Viva',
-    image: undefined,
+    image:
+      'https://bfvid4lplyqsxghx.public.blob.vercel-storage.com/plants/20260802_152200.jpg',
     sensor: false,
+    parent_id: undefined,
   },
   {
     id: '23',
@@ -375,6 +402,7 @@ export const plants: PlantData[] = [
     image:
       'https://bfvid4lplyqsxghx.public.blob.vercel-storage.com/plants/20260516_180947.jpg',
     sensor: false,
+    parent_id: undefined,
   },
   {
     id: '24',
@@ -392,6 +420,7 @@ export const plants: PlantData[] = [
     image:
       'https://bfvid4lplyqsxghx.public.blob.vercel-storage.com/plants/20260516_181054.jpg',
     sensor: false,
+    parent_id: undefined,
   },
   {
     id: '25',
@@ -402,12 +431,13 @@ export const plants: PlantData[] = [
     type: 'Interior',
     origin: 'Jardín de Colomba',
     price: '$4,000',
-    location: 'Pieza Cony',
+    location: 'Living Room',
     placement: 'Norte',
     purchase_date: new Date(2026, 4, 15),
-    status: 'Viva',
+    status: 'Débil',
     image: undefined,
     sensor: false,
+    parent_id: undefined,
   },
   {
     id: '26',
@@ -415,15 +445,16 @@ export const plants: PlantData[] = [
     common_name: 'Repollo ornamental',
     scientific_name: 'Brassica oleracea',
     category: 'Ornamental',
-    type: 'Exterior',
+    type: 'Interior',
     origin: 'Jardín de Colomba',
     price: '$4,000',
-    location: 'Pieza Cony',
+    location: 'Living Room',
     placement: 'Norte',
     purchase_date: new Date(2026, 4, 15),
     status: 'Viva',
     image: undefined,
     sensor: false,
+    parent_id: undefined,
   },
   {
     id: '27',
@@ -437,9 +468,10 @@ export const plants: PlantData[] = [
     location: 'Balcón',
     placement: 'Este',
     purchase_date: undefined,
-    status: 'Débil',
+    status: 'Viva',
     image: undefined,
     sensor: false,
+    parent_id: undefined,
   },
   {
     id: '28',
@@ -457,6 +489,7 @@ export const plants: PlantData[] = [
     image:
       'https://bfvid4lplyqsxghx.public.blob.vercel-storage.com/plants/20260516_181044.jpg',
     sensor: false,
+    parent_id: undefined,
   },
   {
     id: '29',
@@ -471,8 +504,10 @@ export const plants: PlantData[] = [
     placement: 'Carrito',
     purchase_date: undefined,
     status: 'Viva',
-    image: undefined,
+    image:
+      'https://bfvid4lplyqsxghx.public.blob.vercel-storage.com/plants/20260802_144527.jpg',
     sensor: false,
+    parent_id: undefined,
   },
   {
     id: '30',
@@ -490,6 +525,7 @@ export const plants: PlantData[] = [
     image:
       'https://bfvid4lplyqsxghx.public.blob.vercel-storage.com/plants/20260516_180940.jpg',
     sensor: true,
+    parent_id: undefined,
   },
   {
     id: '31',
@@ -507,5 +543,6 @@ export const plants: PlantData[] = [
     image:
       'https://bfvid4lplyqsxghx.public.blob.vercel-storage.com/plants/20260516_181025.jpg',
     sensor: false,
+    parent_id: undefined,
   },
 ];

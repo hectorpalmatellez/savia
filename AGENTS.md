@@ -96,7 +96,7 @@ The `/admin` route is the exception: it renders server-side, but all mutations g
 
 ### Data flow
 
-- `db/Plants.csv` is the source of truth, hand-edited or managed through the dev-only `/admin` UI (see below). Format: `ID` column first (stable integer identity), English long-form dates like `"Wednesday, January 20, 2021"` or ISO `2021-01-20`, prices like `"$3,990"`, `Status` values `Viva`/`Débil`/`Muerta`, `Sensor` `TRUE`/`FALSE`.
+- `db/Plants.csv` is the source of truth, hand-edited or managed through the dev-only `/admin` UI (see below). Format: `ID` column first (stable integer identity), English long-form dates like `"Wednesday, January 20, 2021"` or ISO `2021-01-20`, prices like `"$3,990"`, `Status` values `Viva`/`Débil`/`Muerta`, `Sensor` `TRUE`/`FALSE`. The trailing `ParentID` column links a plant to the ID of the plant it was propagated from (empty for non-propagations).
 - `pnpm sync:data` (`scripts/sync-plants.ts`, a thin wrapper around `src/data/sync.ts`) parses the CSV (`src/data/csv.ts` — hand-rolled RFC 4180-ish parser), normalizes each row to `PlantData`, and regenerates the committed module `src/data/plants-data.ts`. Field semantics live in `csv.ts`: location vocabulary mapping (see "Known quirks"), image URL prefixing with `NEXT_PUBLIC_BLOB_BASE_URL` (hardcoded fallback), sensor `=== 'TRUE'`, dates parsed to local-time `new Date(y, m-1, d)`.
 - **IDs come from the `ID` column** (stable across reorders/deletes); a missing or non-numeric ID falls back to the CSV row number with a warning. `store.ts` `getPlantById(id)` matches the ID column first, then the row number (legacy links still resolve). Appending rows is always safe; deleting rows no longer breaks URLs.
 - **`/admin` (dev only)**: a Mantine CRUD UI backed by server actions (`src/app/admin/actions.ts`) that read/write the CSV and regenerate the data module on every mutation. Writes are blocked when `process.env.VERCEL` is set (serverless filesystem is read-only) — production renders a read-only notice.
@@ -105,7 +105,7 @@ The `/admin` route is the exception: it renders server-side, but all mutations g
 
 ### Image pipeline
 
-1. Phone photos are dropped into `./img/` (or uploaded there from the `/admin` plant form).
+1. Phone photos are dropped into `./img/`, or uploaded there from the `/admin` plant form — the server action runs the same sharp compression and publishes the photo to Vercel Blob immediately.
 2. `pnpm upload:img` (`scripts/upload-images.ts`) re-encodes each image in place with sharp (1600px max width, JPEG quality 82 mozjpeg / WebP 80 / PNG lossless), preserving EXIF (DateTimeOriginal drives the photo date) and baking EXIF orientation into pixels. Then it uploads each file to Vercel Blob at `plants/<filename>` (public access) using `savia_READ_WRITE_TOKEN`, printing the resulting URLs. GIF/SVG are uploaded unchanged.
 3. The `Photo` column in `db/Plants.csv` stores the filename; `pnpm sync:data` bakes the full URL into the generated data.
 

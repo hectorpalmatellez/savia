@@ -123,6 +123,7 @@ export default function HomePageClient({ plants, error }: HomePageClientProps) {
                         'https://placehold.co/600x400?text=No+Photo'
                       }
                       fill
+                      unoptimized={!plant.image}
                       sizes="(max-width: 576px) 100vw, (max-width: 768px) 50vw, 33vw"
                       alt={plant.common_name || 'Planta'}
                       style={{ objectFit: 'cover' }}

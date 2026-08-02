@@ -18,6 +18,7 @@ export interface PlantFormInput {
   photo: string;
   sensor: boolean;
   price: number | undefined;
+  parentId: string | undefined;
 }
 
 export const LOCATION_OPTIONS: Room[] = [
@@ -45,6 +46,7 @@ export function emptyPlantForm(): PlantFormInput {
     photo: '',
     sensor: false,
     price: undefined,
+    parentId: undefined,
   };
 }
 
@@ -84,6 +86,7 @@ export function csvFieldsToPlantForm(fields: string[]): PlantFormInput {
     photo: field(9),
     sensor: field(10) === 'TRUE',
     price: parsePrice(field(11)),
+    parentId: field(12) || undefined,
   };
 }
 
@@ -104,5 +107,6 @@ export function plantFormToCsvFields(input: PlantFormInput): string[] {
     input.photo.trim(),
     input.sensor ? 'TRUE' : 'FALSE',
     input.price === undefined ? '' : formatPrice(input.price),
+    input.parentId?.trim() ?? '',
   ];
 }

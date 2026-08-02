@@ -2,8 +2,10 @@
 
 import fs from 'fs';
 import path from 'path';
+import { put } from '@vercel/blob';
 import { revalidatePath } from 'next/cache';
 import { buildCsvRow } from '@/data/csv';
+import { IMAGE_EXTENSIONS, compressImage } from '@/data/image-compress';
 import type { PlantFormInput } from '@/data/plant-form';
 import { readCsv, syncFromCsv, writeCsv } from '@/data/sync';
 
@@ -15,7 +17,6 @@ export type UploadResult =
   | { ok: false; error: string };
 
 const IMG_DIR = path.join(process.cwd(), 'img');
-const ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
 
 function editableError(): string | null {
   if (process.env.VERCEL) {
@@ -94,19 +95,44 @@ export async function uploadPhoto(formData: FormData): Promise<UploadResult> {
   }
 
   const ext = path.extname(file.name).toLowerCase();
-  if (!ALLOWED_EXTENSIONS.includes(ext)) {
+  if (!IMAGE_EXTENSIONS.includes(ext)) {
     return {
       ok: false,
-      error: `Formato no permitido: ${ALLOWED_EXTENSIONS.join(', ')}`,
+      error: `Formato no permitido: ${IMAGE_EXTENSIONS.join(', ')}`,
     };
   }
 
   const filename = path.basename(file.name);
+  const filePath = path.join(IMG_DIR, filename);
   fs.mkdirSync(IMG_DIR, { recursive: true });
-  fs.writeFileSync(
-    path.join(IMG_DIR, filename),
-    Buffer.from(await file.arrayBuffer()),
-  );
+  fs.writeFileSync(filePath, Buffer.from(await file.arrayBuffer()));
 
-  return { ok: true, filename, warnings: [] };
+  const warnings: string[] = [];
+  try {
+    await compressImage(filePath);
+  } catch (error) {
+    warnings.push(
+      `La foto se guardó sin comprimir: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
+
+  const token = process.env.savia_READ_WRITE_TOKEN;
+  if (token) {
+    try {
+      await put(`plants/${filename}`, fs.readFileSync(filePath), {
+        access: 'public',
+        token,
+      });
+    } catch (error) {
+      warnings.push(
+        `La foto se guardó en ./img pero no se publicó en Blob: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
+  } else {
+    warnings.push(
+      'savia_READ_WRITE_TOKEN no está configurado — la foto solo quedó en ./img.',
+    );
+  }
+
+  return { ok: true, filename, warnings };
 }

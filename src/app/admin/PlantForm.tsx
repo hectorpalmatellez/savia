@@ -28,6 +28,7 @@ interface PlantFormProps {
   busy: boolean;
   onSubmit: (input: PlantFormInput) => void;
   onCancel: () => void;
+  parentOptions: { value: string; label: string }[];
 }
 
 type FormValues = Omit<PlantFormInput, 'price'> & { price: string };
@@ -37,6 +38,7 @@ export default function PlantForm({
   busy,
   onSubmit,
   onCancel,
+  parentOptions,
 }: PlantFormProps) {
   const form = useForm<FormValues>({
     initialValues: {
@@ -91,6 +93,17 @@ export default function PlantForm({
     <form onSubmit={handleSubmit}>
       <Stack gap="md">
         <Grid>
+          <Grid.Col span={12}>
+            <Select
+              label="Planta madre (propagación)"
+              placeholder="Ninguna — planta original"
+              data={parentOptions}
+              clearable
+              searchable
+              nothingFoundMessage="No se encontró la planta"
+              {...form.getInputProps('parentId')}
+            />
+          </Grid.Col>
           <Grid.Col span={{ base: 12, sm: 6 }}>
             <TextInput
               label="Nombre"
@@ -178,7 +191,7 @@ export default function PlantForm({
                 </Text>
               )}
               <Text size="xs" c="dimmed">
-                Se guarda en ./img — luego ejecuta pnpm upload:img.
+                Se comprime, se guarda en ./img y se publica en Blob.
               </Text>
               {preview && (
                 <Image

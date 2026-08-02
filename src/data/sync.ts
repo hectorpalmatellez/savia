@@ -45,10 +45,16 @@ export function readCsv(): string[][] {
 }
 
 /**
- * Writes the data rows back to the CSV file (header included).
+ * Writes the data rows back to the CSV file (header included). Rows are
+ * padded to the header length so a new trailing column (e.g. ParentID)
+ * stays consistent even for rows that were read before the column existed.
  */
 export function writeCsv(rows: string[][]): void {
-  fs.writeFileSync(CSV_PATH, serializeCsv(PLANT_HEADERS, rows));
+  const padded = rows.map(row => [
+    ...row,
+    ...Array(Math.max(0, PLANT_HEADERS.length - row.length)).fill(''),
+  ]);
+  fs.writeFileSync(CSV_PATH, serializeCsv(PLANT_HEADERS, padded));
 }
 
 function serializePlant(plant: PlantData): string {
@@ -77,6 +83,7 @@ function serializePlant(plant: PlantData): string {
     `    status: ${quote(plant.status)},`,
     `    image: ${quote(plant.image)},`,
     `    sensor: ${plant.sensor},`,
+    `    parent_id: ${quote(plant.parent_id)},`,
     '  },',
   ].join('\n');
 }

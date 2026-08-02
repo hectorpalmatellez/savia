@@ -23,4 +23,5 @@ export interface PlantData {
   status?: PlantStatus;
   image?: string;
   sensor?: boolean;
+  parent_id?: string;
 }
