@@ -10,7 +10,9 @@ dotenv.config({ path: path.join(process.cwd(), '.env.local'), override: true });
 const BLOB_TOKEN = process.env.savia_READ_WRITE_TOKEN;
 
 if (!BLOB_TOKEN) {
-  console.error('Error: savia_READ_WRITE_TOKEN environment variable is not set');
+  console.error(
+    'Error: savia_READ_WRITE_TOKEN environment variable is not set',
+  );
   process.exit(1);
 }
 
@@ -30,7 +32,9 @@ async function uploadImages() {
   });
 
   if (files.length === 0) {
-    console.log(`No image files found in the ./img/ directory. Total files found: ${allFiles.length}`);
+    console.log(
+      `No image files found in the ./img/ directory. Total files found: ${allFiles.length}`,
+    );
     return;
   }
 

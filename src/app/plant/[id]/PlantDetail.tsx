@@ -52,7 +52,11 @@ export default function PlantDetail({ plant }: { plant: PlantData }) {
               const datePart = parts[0].replace(/:/g, '-');
               const [year, month, day] = datePart.split('-');
               if (year && month && day) {
-                const dateObj = new Date(Number(year), Number(month) - 1, Number(day));
+                const dateObj = new Date(
+                  Number(year),
+                  Number(month) - 1,
+                  Number(day),
+                );
                 setPhotoDate(formatDate(dateObj));
               } else {
                 setPhotoDate(datePart);
@@ -177,7 +181,6 @@ export default function PlantDetail({ plant }: { plant: PlantData }) {
           )}
         </Stack>
 
-
         {/* Acquisition Section */}
         {(plant.origin || plant.price || plant.purchase_date) && (
           <Card withBorder padding="sm" radius="md" bg="gray.0">
@@ -187,17 +190,26 @@ export default function PlantDetail({ plant }: { plant: PlantData }) {
             <Stack gap={2}>
               {plant.purchase_date && (
                 <Text size="sm" fw={500}>
-                  📅 Fecha: <Text component="span" fw={700}>{formatDate(plant.purchase_date)}</Text>
+                  📅 Fecha:{' '}
+                  <Text component="span" fw={700}>
+                    {formatDate(plant.purchase_date)}
+                  </Text>
                 </Text>
               )}
               {plant.origin && (
                 <Text size="sm" fw={500}>
-                  🏷️ Origen: <Text component="span" fw={700}>{plant.origin}</Text>
+                  🏷️ Origen:{' '}
+                  <Text component="span" fw={700}>
+                    {plant.origin}
+                  </Text>
                 </Text>
               )}
               {plant.price && (
                 <Text size="sm" fw={500}>
-                  💰 Precio: <Text component="span" fw={700}>{plant.price}</Text>
+                  💰 Precio:{' '}
+                  <Text component="span" fw={700}>
+                    {plant.price}
+                  </Text>
                 </Text>
               )}
             </Stack>
