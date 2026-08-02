@@ -13,6 +13,7 @@ import {
   Badge,
 } from '@mantine/core';
 import Link from 'next/link';
+import ThemeToggle from './ThemeToggle';
 
 const theme = createTheme({
   primaryColor: 'green',
@@ -30,7 +31,7 @@ export default function RootLayout({
         <ColorSchemeScript />
       </head>
       <body>
-        <MantineProvider theme={theme}>
+        <MantineProvider theme={theme} defaultColorScheme="auto">
           {/* header={{ height: 60 }} reserves the space at the top */}
           <AppShell header={{ height: 60 }} padding="md">
             <AppShellHeader>
@@ -48,9 +49,12 @@ export default function RootLayout({
                     </Text>
                   </Link>
 
-                  <Badge color="green" variant="light" size="sm">
-                    Mi Jardín
-                  </Badge>
+                  <Group gap="xs">
+                    <Badge color="green" variant="light" size="sm">
+                      Mi Jardín
+                    </Badge>
+                    <ThemeToggle />
+                  </Group>
                 </Group>
               </Container>
             </AppShellHeader>
