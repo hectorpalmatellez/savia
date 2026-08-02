@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Alert,
@@ -9,6 +9,10 @@ import {
   Container,
   Group,
   Modal,
+  MultiSelect,
+  Paper,
+  RangeSlider,
+  Select,
   Stack,
   Switch,
   Table,
@@ -36,6 +40,7 @@ interface RowView {
   name: string;
   status: string;
   location: string;
+  category: string;
   price: string;
   sensor: boolean;
   photo: string;
@@ -49,6 +54,7 @@ function toRowView(row: string[]): RowView {
     name: form.name,
     status: form.status,
     location: form.location,
+    category: form.category,
     price: form.price !== undefined ? formatPrice(form.price) : '',
     sensor: form.sensor,
     photo: form.photo,
@@ -73,11 +79,78 @@ export default function AdminPageClient({
   const [feedback, setFeedback] = useState<string | null>(null);
   const [warnings, setWarnings] = useState<string[]>([]);
   const [hideDead, setHideDead] = useState(true);
+  const [locationFilter, setLocationFilter] = useState<string[]>([]);
+  const [sensorFilter, setSensorFilter] = useState<boolean | null>(null);
+  const [categoryFilter, setCategoryFilter] = useState<string[]>([]);
+  const [priceRange, setPriceRange] = useState<[number, number] | null>(null);
 
-  const plants = rows.map(toRowView);
-  const visiblePlants = hideDead
-    ? plants.filter(plant => plant.status !== 'Muerta')
-    : plants;
+  const plants = useMemo(() => rows.map(toRowView), [rows]);
+
+  const priceBounds = useMemo(() => {
+    const prices = plants
+      .map(plant => plant.form.price)
+      .filter((price): price is number => price !== undefined);
+    if (prices.length === 0) return null;
+    return [Math.min(...prices), Math.max(...prices)] as [number, number];
+  }, [plants]);
+
+  const [prevPriceBounds, setPrevPriceBounds] = useState(priceBounds);
+  if (prevPriceBounds !== priceBounds) {
+    setPrevPriceBounds(priceBounds);
+    setPriceRange(null);
+  }
+
+  const locationOptions = useMemo(
+    () =>
+      Array.from(new Set(plants.map(plant => plant.location)))
+        .filter(Boolean)
+        .map(location => ({ value: location, label: location })),
+    [plants],
+  );
+
+  const categoryOptions = useMemo(
+    () =>
+      Array.from(new Set(plants.map(plant => plant.form.category)))
+        .filter(Boolean)
+        .map(category => ({ value: category, label: category })),
+    [plants],
+  );
+
+  const filtersActive =
+    locationFilter.length > 0 ||
+    sensorFilter !== null ||
+    categoryFilter.length > 0 ||
+    priceRange !== null;
+
+  const visiblePlants = plants.filter(plant => {
+    if (hideDead && plant.status === 'Muerta') return false;
+    if (locationFilter.length > 0 && !locationFilter.includes(plant.location)) {
+      return false;
+    }
+    if (sensorFilter !== null && plant.sensor !== sensorFilter) return false;
+    if (
+      categoryFilter.length > 0 &&
+      !categoryFilter.includes(plant.form.category)
+    ) {
+      return false;
+    }
+    if (
+      priceRange &&
+      (plant.form.price === undefined ||
+        plant.form.price < priceRange[0] ||
+        plant.form.price > priceRange[1])
+    ) {
+      return false;
+    }
+    return true;
+  });
+
+  const clearFilters = () => {
+    setLocationFilter([]);
+    setSensorFilter(null);
+    setCategoryFilter([]);
+    setPriceRange(null);
+  };
 
   const parentName = (parentId?: string) =>
     parentId
@@ -125,7 +198,7 @@ export default function AdminPageClient({
           <Title order={2}>Administrar plantas</Title>
           <Text size="sm" c="dimmed">
             Edita db/Plants.csv y regenera los datos (
-            {hideDead && visiblePlants.length !== plants.length
+            {hideDead || filtersActive
               ? `${visiblePlants.length} de ${plants.length}`
               : plants.length}{' '}
             plantas)
@@ -145,6 +218,73 @@ export default function AdminPageClient({
           )}
         </Group>
       </Group>
+
+      <Paper withBorder p="md" mb="md">
+        <Stack gap="md">
+          <Group justify="space-between" align="center">
+            <Text fw={600}>Filtros</Text>
+            <Button
+              size="xs"
+              variant="subtle"
+              onClick={clearFilters}
+              disabled={!filtersActive}
+            >
+              Limpiar filtros
+            </Button>
+          </Group>
+          <Group align="flex-end" grow>
+            <MultiSelect
+              label="Ubicación"
+              placeholder="Todas"
+              data={locationOptions}
+              value={locationFilter}
+              onChange={setLocationFilter}
+              clearable
+              searchable
+              nothingFoundMessage="Sin resultados"
+            />
+            <Select
+              label="Sensor"
+              placeholder="Todos"
+              data={[
+                { value: 'true', label: 'Sí' },
+                { value: 'false', label: 'No' },
+              ]}
+              value={sensorFilter === null ? null : String(sensorFilter)}
+              onChange={value =>
+                setSensorFilter(value === null ? null : value === 'true')
+              }
+              clearable
+            />
+            <MultiSelect
+              label="Categoría"
+              placeholder="Todas"
+              data={categoryOptions}
+              value={categoryFilter}
+              onChange={setCategoryFilter}
+              clearable
+              searchable
+              nothingFoundMessage="Sin resultados"
+            />
+          </Group>
+          {priceBounds && (
+            <Stack gap={4}>
+              <Text size="xs" c="dimmed">
+                Precio: {formatPrice(priceRange?.[0] ?? priceBounds[0])} –{' '}
+                {formatPrice(priceRange?.[1] ?? priceBounds[1])}
+              </Text>
+              <RangeSlider
+                min={priceBounds[0]}
+                max={priceBounds[1]}
+                step={100}
+                value={priceRange ?? priceBounds}
+                onChange={setPriceRange}
+                label={formatPrice}
+              />
+            </Stack>
+          )}
+        </Stack>
+      </Paper>
 
       {readOnly && (
         <Alert color="yellow" mb="md">
@@ -197,6 +337,15 @@ export default function AdminPageClient({
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
+          {visiblePlants.length === 0 && (
+            <Table.Tr>
+              <Table.Td colSpan={readOnly ? 8 : 9}>
+                <Text c="dimmed" ta="center" py="md">
+                  Sin plantas que coincidan con los filtros.
+                </Text>
+              </Table.Td>
+            </Table.Tr>
+          )}
           {visiblePlants.map(plant => (
             <Table.Tr key={plant.id}>
               <Table.Td>{plant.id}</Table.Td>
