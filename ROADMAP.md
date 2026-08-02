@@ -29,4 +29,9 @@ Feature proposals for `savia`, grouped by impact/effort. Items in the same group
 
 ## Done / retired ideas
 
-- None yet — this is the first roadmap pass.
+- **Move the hardcoded Blob URL to an env var.** Done — `NEXT_PUBLIC_BLOB_BASE_URL` with built-in fallback in `api.ts`; documented in `.env.example`, `README.md`, `AGENTS.md`.
+- **Remove dead code.** Done — `PLANT_DATA`, `page.module.css`, `PlantDetail.module.css`, `globals.css`, empty `src/components/` and `src/pages/`.
+- **Enable the sensor filter.** Done — "Todos / Con sensor / Sin sensor" SegmentedControl on the grid.
+- **Dark mode toggle.** Done — `ThemeToggle.tsx` in the header (Mantine `useMantineColorScheme`, persisted automatically).
+- **Replace README.md boilerplate.** Done — project description, setup, env-var table, scripts, image pipeline, architecture summary.
+- **Add lint + typecheck to CI.** Done — `.github/workflows/ci.yml` runs lint, typecheck and format:check (new `npm run typecheck` script).

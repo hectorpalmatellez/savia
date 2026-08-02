@@ -14,16 +14,16 @@ Guidance for AI agents working on the `savia` codebase.
 
 ## Stack
 
-| Layer | Technology |
-| --- | --- |
-| Framework | Next.js 16.1.6 (App Router, Turbopack-compatible) |
-| UI | React 19.2.3, Mantine v8 (`@mantine/core`, `@mantine/hooks`) |
-| Language | TypeScript 5, `strict: true` |
-| Styling | Mantine inline props + `postcss-preset-mantine` (`postcss.config.mjs` defines all 5 Mantine breakpoints) |
-| Images | `@vercel/blob` (public storage), `exif-js` for EXIF dates |
-| Build extras | React Compiler enabled (`next.config.ts` → `reactCompiler: true`) |
-| Deployment | Vercel (`.vercel/project.json`) |
-| Tooling | ESLint 9 flat config, Prettier 3, `tsx` for scripts |
+| Layer        | Technology                                                                                               |
+| ------------ | -------------------------------------------------------------------------------------------------------- |
+| Framework    | Next.js 16.1.6 (App Router, Turbopack-compatible)                                                        |
+| UI           | React 19.2.3, Mantine v8 (`@mantine/core`, `@mantine/hooks`)                                             |
+| Language     | TypeScript 5, `strict: true`                                                                             |
+| Styling      | Mantine inline props + `postcss-preset-mantine` (`postcss.config.mjs` defines all 5 Mantine breakpoints) |
+| Images       | `@vercel/blob` (public storage), `exif-js` for EXIF dates                                                |
+| Build extras | React Compiler enabled (`next.config.ts` → `reactCompiler: true`)                                        |
+| Deployment   | Vercel (`.vercel/project.json`)                                                                          |
+| Tooling      | ESLint 9 flat config, Prettier 3, `tsx` for scripts                                                      |
 
 ## Commands
 
@@ -39,12 +39,13 @@ npm run upload:img   # npx tsx scripts/upload-images.ts
 
 ## Environment variables
 
-| Variable | Where | Purpose |
-| --- | --- | --- |
-| `NEXT_PUBLIC_API_URL` | `.env` / `.env.local` | Base URL of the remote plant API (required; app throws at import if missing) |
-| `API_KEY` | `.env` / `.env.local` | Sent as `X-API-Key` header on API requests |
-| `savia_READ_WRITE_TOKEN` | `.env.local` only | Vercel Blob write token for `scripts/upload-images.ts` |
-| `VERCEL_OIDC_TOKEN` | `.env.local` only | Vercel-supplied OIDC token |
+| Variable                    | Where                 | Purpose                                                                      |
+| --------------------------- | --------------------- | ---------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_API_URL`       | `.env` / `.env.local` | Base URL of the remote plant API (required; app throws at import if missing) |
+| `API_KEY`                   | `.env` / `.env.local` | Sent as `X-API-Key` header on API requests                                   |
+| `NEXT_PUBLIC_BLOB_BASE_URL` | `.env` / `.env.local` | Vercel Blob base URL for plant photos (has a built-in fallback in `api.ts`)  |
+| `savia_READ_WRITE_TOKEN`    | `.env.local` only     | Vercel Blob write token for `scripts/upload-images.ts`                       |
+| `VERCEL_OIDC_TOKEN`         | `.env.local` only     | Vercel-supplied OIDC token                                                   |
 
 ## Architecture
 
@@ -53,19 +54,18 @@ npm run upload:img   # npx tsx scripts/upload-images.ts
 ```
 src/
 ├── app/                    # App Router routes
-│   ├── layout.tsx          # Root layout: MantineProvider + AppShell header ("SAVIA" wordmark)
+│   ├── layout.tsx          # Root layout: MantineProvider (defaultColorScheme="auto") + AppShell header
 │   ├── page.tsx            # Home — server component (ISR fetch)
-│   ├── HomePageClient.tsx  # 'use client' — search/filter grid UI
+│   ├── HomePageClient.tsx  # 'use client' — search/status/sensor filter grid UI
+│   ├── ThemeToggle.tsx     # 'use client' — dark/light mode toggle (header)
 │   └── plant/[id]/
 │       ├── page.tsx        # Detail — server component (ISR fetch)
 │       ├── PlantDetailPageClient.tsx  # 'use client' — cache wrapper
 │       └── PlantDetail.tsx # 'use client' — detail UI (EXIF date, badges, modal)
-├── components/             # empty placeholder (components live next to their routes)
 ├── data/
-│   ├── plants.ts           # PlantData type + legacy sample data (mostly dead)
+│   ├── plants.ts           # PlantData type (API→PlantData mapping in api.ts)
 │   ├── api.ts              # fetchPlants / fetchPlantById + API→PlantData mapping
 │   └── cache.ts            # localStorage cache helpers (key: savia_plants_cache)
-└── pages/                  # empty placeholder — App Router is used instead
 scripts/
 └── upload-images.ts        # uploads ./img/* photos to Vercel Blob under plants/
 ```
@@ -86,6 +86,7 @@ Every route follows the same three-layer pattern:
 - `src/data/api.ts` maps those records to `PlantData` (see `mapApiPlantToPlantData`). Image URLs are built by prefixing the `Photo` filename with a hardcoded Vercel Blob base URL.
 - **IDs are array indexes.** The API stopped returning `ID`, so `fetchPlantById(id)` fetches the entire collection and returns `data[index]` via `parseInt(id, 10)`. Route links (`/plant/{id}`) therefore encode position, not a stable key. Do not assume IDs are stable across API changes.
 - Client-side cache (`src/data/cache.ts`): `localStorage` key `savia_plants_cache`, all helpers wrapped in try/catch (guards SSR/private mode).
+- Image base URL comes from `NEXT_PUBLIC_BLOB_BASE_URL` with a hardcoded fallback in `src/data/api.ts` (see `.env.example`).
 
 ### Image pipeline
 
@@ -104,11 +105,8 @@ EXIF dates are read client-side in `PlantDetail.tsx` (`DateTimeOriginal` / `Crea
 ## Known quirks & technical debt
 
 - **Index-based IDs**: plant URLs break if the API reorders or filters records. See "Data flow" above.
-- **Hardcoded Blob URL**: `BLOB_BASE_URL` in `src/data/api.ts:7` should move to an env var.
-- **Dead code**: `PLANT_DATA` sample data in `src/data/plants.ts` (references a non-existent `/images/monstera.jpg`), `src/app/page.module.css`, `PlantDetail.module.css` (unreferenced), leftover `globals.css` boilerplate, empty `src/components/` and `src/pages/`.
 - **Mixed languages in data**: `location` values mix English (`'Living Room'`) and Spanish (`'Dormitorio'`, `'Balcón'`); the normalization ternary in `api.ts` silently defaults anything unknown to `'Living Room'`.
-- **Commented-out feature**: the sensor filter in `HomePageClient.tsx` (`.filter(plant => plant.sensor === true)`) is disabled.
-- **No tests**, no lint/typecheck CI. README.md is untouched create-next-app boilerplate.
+- **No tests**; README.md is curated (not boilerplate). Lint, typecheck and format checks run in CI (`.github/workflows/ci.yml`).
 - `fetchPlantById` re-fetches the whole collection (O(n)) — fine at personal scale, not a scalability pattern.
 
 ## Conventions
