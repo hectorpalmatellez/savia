@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { PlantData } from '@/data/plants';
 import { setCachedPlants } from '@/data/cache';
 import {
@@ -9,7 +10,7 @@ import {
   SimpleGrid,
   Card,
   CardSection,
-  Image,
+  Box,
   Badge,
   Group,
   Button,
@@ -115,14 +116,18 @@ export default function HomePageClient({ plants, error }: HomePageClientProps) {
               {/* Image with a guaranteed height */}
               <CardSection>
                 <Link href={`/plant/${plant.id}`}>
-                  <Image
-                    src={
-                      plant.image ||
-                      'https://placehold.co/600x400?text=No+Photo'
-                    }
-                    height={160}
-                    alt={plant.common_name || 'Planta'}
-                  />
+                  <Box pos="relative" h={160}>
+                    <Image
+                      src={
+                        plant.image ||
+                        'https://placehold.co/600x400?text=No+Photo'
+                      }
+                      fill
+                      sizes="(max-width: 576px) 100vw, (max-width: 768px) 50vw, 33vw"
+                      alt={plant.common_name || 'Planta'}
+                      style={{ objectFit: 'cover' }}
+                    />
+                  </Box>
                 </Link>
               </CardSection>
 

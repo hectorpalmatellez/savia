@@ -3,15 +3,15 @@ import {
   Container,
   Title,
   Text,
-  Image,
   Card,
   Badge,
   Stack,
   Group,
-  AspectRatio,
+  Box,
   Button,
   Modal,
 } from '@mantine/core';
+import NextImage from 'next/image';
 import { useDisclosure } from '@mantine/hooks';
 import { PlantData } from '@/data/plants';
 import { useEffect, useState } from 'react';
@@ -102,13 +102,25 @@ export default function PlantDetail({ plant }: { plant: PlantData }) {
           )}
         </Group>
 
-        <AspectRatio ratio={1}>
-          <Image
+        <Box
+          pos="relative"
+          w="100%"
+          style={{
+            aspectRatio: '1 / 1',
+            borderRadius: 'var(--mantine-radius-lg)',
+          }}
+        >
+          <NextImage
             src={plant.image || 'https://placehold.co/600x400?text=Sin+Foto'}
-            radius="lg"
-            alt={plant.common_name}
+            fill
+            sizes="(max-width: 640px) 100vw, 576px"
+            alt={plant.common_name || 'Planta'}
+            style={{
+              objectFit: 'cover',
+              borderRadius: 'var(--mantine-radius-lg)',
+            }}
           />
-        </AspectRatio>
+        </Box>
 
         <Group justify="space-between" align="center" mt={-10}>
           {photoDate ? (
@@ -132,11 +144,15 @@ export default function PlantDetail({ plant }: { plant: PlantData }) {
           size="xl"
           centered
         >
-          <Image
-            src={plant.image || 'https://placehold.co/600x400?text=Sin+Foto'}
-            alt={plant.common_name}
-            radius="md"
-          />
+          <Box pos="relative" style={{ width: '100%', height: '75vh' }}>
+            <NextImage
+              src={plant.image || 'https://placehold.co/600x400?text=Sin+Foto'}
+              fill
+              sizes="(max-width: 768px) 100vw, 1100px"
+              alt={plant.common_name || 'Planta'}
+              style={{ objectFit: 'contain' }}
+            />
+          </Box>
         </Modal>
 
         <Stack gap={2}>
