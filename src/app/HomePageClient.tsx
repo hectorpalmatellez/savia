@@ -27,6 +27,7 @@ interface HomePageClientProps {
 export default function HomePageClient({ plants, error }: HomePageClientProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('Todas');
+  const [sensorFilter, setSensorFilter] = useState('Todos');
 
   useEffect(() => {
     // Cache plants when page loads
@@ -35,11 +36,12 @@ export default function HomePageClient({ plants, error }: HomePageClientProps) {
     }
   }, [plants]);
 
-  const filteredPlants = plants.filter((plant) => {
+  const filteredPlants = plants.filter(plant => {
     const query = searchQuery.toLowerCase();
     const nameMatch = plant.common_name?.toLowerCase().includes(query) ?? false;
-    const scientificMatch = plant.scientific_name?.toLowerCase().includes(query) ?? false;
-    const searchMatch = query ? (nameMatch || scientificMatch) : true;
+    const scientificMatch =
+      plant.scientific_name?.toLowerCase().includes(query) ?? false;
+    const searchMatch = query ? nameMatch || scientificMatch : true;
 
     let statusMatch = true;
     if (statusFilter === 'Vivas') {
@@ -48,7 +50,14 @@ export default function HomePageClient({ plants, error }: HomePageClientProps) {
       statusMatch = plant.status === 'Muerta';
     }
 
-    return searchMatch && statusMatch;
+    let sensorMatch = true;
+    if (sensorFilter === 'Con sensor') {
+      sensorMatch = plant.sensor === true;
+    } else if (sensorFilter === 'Sin sensor') {
+      sensorMatch = !plant.sensor;
+    }
+
+    return searchMatch && statusMatch && sensorMatch;
   });
 
   if (error && plants.length === 0) {
@@ -65,7 +74,7 @@ export default function HomePageClient({ plants, error }: HomePageClientProps) {
         <TextInput
           placeholder="Buscar plantas por nombre o nombre científico..."
           value={searchQuery}
-          onChange={(event) => setSearchQuery(event.currentTarget.value)}
+          onChange={event => setSearchQuery(event.currentTarget.value)}
           size="md"
           radius="md"
           style={{ flex: 1 }}
@@ -77,15 +86,20 @@ export default function HomePageClient({ plants, error }: HomePageClientProps) {
           size="md"
           radius="md"
         />
+        <SegmentedControl
+          data={['Todos', 'Con sensor', 'Sin sensor']}
+          value={sensorFilter}
+          onChange={setSensorFilter}
+          size="md"
+          radius="md"
+        />
       </Group>
 
       <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
         {filteredPlants.length === 0 ? (
           <Text c="dimmed">No plants available</Text>
         ) : (
-          filteredPlants
-            // .filter(plant => plant.sensor === true)
-            .map(plant => (
+          filteredPlants.map(plant => (
             <Card
               key={plant.id}
               shadow="sm"
@@ -100,16 +114,15 @@ export default function HomePageClient({ plants, error }: HomePageClientProps) {
             >
               {/* Image with a guaranteed height */}
               <CardSection>
-                <Link
-                    href={`/plant/${plant.id}`}
-                >
-                <Image
-                  src={
-                    plant.image || 'https://placehold.co/600x400?text=No+Photo'
-                  }
-                  height={160}
-                  alt={plant.common_name || 'Planta'}
-                />
+                <Link href={`/plant/${plant.id}`}>
+                  <Image
+                    src={
+                      plant.image ||
+                      'https://placehold.co/600x400?text=No+Photo'
+                    }
+                    height={160}
+                    alt={plant.common_name || 'Planta'}
+                  />
                 </Link>
               </CardSection>
 
@@ -164,7 +177,6 @@ export default function HomePageClient({ plants, error }: HomePageClientProps) {
                       📍 {plant.placement}
                     </Text>
                   )}
-
                 </div>
               </Stack>
 
