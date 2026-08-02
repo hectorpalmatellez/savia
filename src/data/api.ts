@@ -4,7 +4,9 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const API_KEY = process.env.API_KEY;
 
 // Vercel Blob storage base URL for plant images
-const BLOB_BASE_URL = 'https://bfvid4lplyqsxghx.public.blob.vercel-storage.com/plants/';
+const BLOB_BASE_URL =
+  process.env.NEXT_PUBLIC_BLOB_BASE_URL ||
+  'https://bfvid4lplyqsxghx.public.blob.vercel-storage.com/plants/';
 
 if (!API_URL) {
   throw new Error('NEXT_PUBLIC_API_URL environment variable is not set');
@@ -42,7 +44,10 @@ interface ApiResponse {
 /**
  * Maps API response format to PlantData format
  */
-function mapApiPlantToPlantData(apiPlant: ApiPlantRecord, index: number): PlantData {
+function mapApiPlantToPlantData(
+  apiPlant: ApiPlantRecord,
+  index: number,
+): PlantData {
   return {
     id: apiPlant.ID || index.toString(),
     row: apiPlant._row,
@@ -108,7 +113,9 @@ export async function fetchPlants(): Promise<PlantData[]> {
       throw new Error('API returned success: false');
     }
 
-    return (data.data || []).map((apiPlant, index) => mapApiPlantToPlantData(apiPlant, index));
+    return (data.data || []).map((apiPlant, index) =>
+      mapApiPlantToPlantData(apiPlant, index),
+    );
   } catch (error) {
     console.error('Error fetching plants from API:', error);
     throw error;
@@ -145,7 +152,10 @@ export async function fetchPlantById(id: string): Promise<PlantData | null> {
     // Find the plant by index in the response since ID is removed
     const index = parseInt(id, 10);
     const apiPlants = data.data || [];
-    const apiPlant = !isNaN(index) && index >= 0 && index < apiPlants.length ? apiPlants[index] : undefined;
+    const apiPlant =
+      !isNaN(index) && index >= 0 && index < apiPlants.length
+        ? apiPlants[index]
+        : undefined;
     return apiPlant ? mapApiPlantToPlantData(apiPlant, index) : null;
   } catch (error) {
     console.error(`Error fetching plant ${id} from API:`, error);
