@@ -1,23 +1,11 @@
-import { fetchPlants } from '@/data/api';
-import { PlantData } from '@/data/plants';
+import { getPlants } from '@/data/store';
 import HomePageClient from './HomePageClient';
 
-export const revalidate = 60;
+export default function HomePage() {
+  const allPlants = getPlants().map((plant, index) => ({
+    ...plant,
+    id: plant.id || index.toString(),
+  }));
 
-export default async function HomePage() {
-  let allPlants: PlantData[] = [];
-  let error: string | null = null;
-
-  try {
-    const plants = await fetchPlants();
-    allPlants = plants.map((plant, index) => ({
-      ...plant,
-      id: plant.id || index.toString(),
-    }));
-  } catch (err) {
-    error = err instanceof Error ? err.message : 'Error fetching plants';
-    console.error('Error fetching plants:', error);
-  }
-
-  return <HomePageClient plants={allPlants} error={error} />;
+  return <HomePageClient plants={allPlants} error={null} />;
 }

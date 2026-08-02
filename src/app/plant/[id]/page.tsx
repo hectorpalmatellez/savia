@@ -1,8 +1,6 @@
-import { fetchPlantById } from '@/data/api';
+import { getPlantById } from '@/data/store';
 import { notFound } from 'next/navigation';
 import PlantDetailPageClient from './PlantDetailPageClient';
-
-export const revalidate = 60;
 
 export default async function Page({
   params,
@@ -10,13 +8,7 @@ export default async function Page({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  let plant = null;
-
-  try {
-    plant = await fetchPlantById(id);
-  } catch (error) {
-    console.error(`Error fetching plant ${id}:`, error);
-  }
+  const plant = getPlantById(id);
 
   if (!plant) {
     console.log(`Plant ID "${id}" not found`);

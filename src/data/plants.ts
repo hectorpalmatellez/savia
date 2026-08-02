@@ -1,4 +1,10 @@
-type Room = 'Living Room' | 'Bedroom' | 'Kitchen' | 'Dormitorio' | 'Balcón';
+export type Room =
+  | 'Living Room'
+  | 'Bedroom'
+  | 'Kitchen'
+  | 'Dormitorio'
+  | 'Balcón'
+  | 'Pieza Cony';
 
 export type PlantStatus = 'Viva' | 'Débil' | 'Muerta' | null | undefined;
 
